@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { feedService } from '../../api/services/feedService';
 import { animalService } from '../../api/services/animalService';
+import InventoryForm from './InventoryForm';
 import { 
   Beef, 
   Sparkles, 
@@ -19,6 +20,18 @@ const FeedManagement = () => {
   const [recommendation, setRecommendation] = useState(null);
   const [loadingAi, setLoadingAi] = useState(false);
   const [selectedAnimal, setSelectedAnimal] = useState('');
+  const [showInventoryModal, setShowInventoryModal] = useState(false);
+  const [selectedInventoryItem, setSelectedInventoryItem] = useState(null);
+
+  const handleUpdateStock = (item) => {
+    setSelectedInventoryItem(item);
+    setShowInventoryModal(true);
+  };
+
+  const handleUpdateSuccess = () => {
+    setShowInventoryModal(false);
+    fetchFeedData();
+  };
 
   useEffect(() => {
     fetchFeedData();
@@ -132,6 +145,13 @@ const FeedManagement = () => {
                     <span className={`stock-badge ${item.quantityKg < 500 ? 'low' : ''}`}>
                       {item.quantityKg} kg
                     </span>
+                    <button 
+                      className="btn-icon btn-sm ml-2" 
+                      onClick={() => handleUpdateStock(item)}
+                      title="Update Stock"
+                    >
+                      <Plus size={14} />
+                    </button>
                   </div>
                 </div>
               ))}
@@ -139,6 +159,14 @@ const FeedManagement = () => {
           </div>
         </div>
       </div>
+
+      {showInventoryModal && (
+        <InventoryForm 
+          item={selectedInventoryItem}
+          onSuccess={handleUpdateSuccess}
+          onCancel={() => setShowInventoryModal(false)}
+        />
+      )}
 
       <style jsx>{`
         .feed-page { display: flex; flex-direction: column; gap: 2rem; }

@@ -209,8 +209,14 @@ const MilkRecords = () => {
 
         .milk-grid {
           display: grid;
-          grid-template-columns: 350px 1fr;
+          grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
           gap: 2rem;
+        }
+
+        @media (min-width: 1024px) {
+          .milk-grid {
+            grid-template-columns: 350px 1fr;
+          }
         }
 
         .card-header {

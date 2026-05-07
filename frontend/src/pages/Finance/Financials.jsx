@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { financeService } from '../../api/services/financeService';
+import FinanceForm from './FinanceForm';
 import { 
   DollarSign, 
   ArrowUpRight, 
@@ -16,6 +17,12 @@ const Financials = () => {
   const [summary, setSummary] = useState(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('revenue');
+  const [showModal, setShowModal] = useState(false);
+
+  const handleAddSuccess = () => {
+    setShowModal(false);
+    fetchFinancialData();
+  };
 
   useEffect(() => {
     fetchFinancialData();
@@ -103,7 +110,10 @@ const Financials = () => {
         <div className="table-card card">
           <div className="table-header">
             <h3>Recent {activeTab === 'revenue' ? 'Revenue' : 'Expenses'}</h3>
-            <button className="btn btn-primary btn-sm">
+            <button 
+              className="btn btn-primary btn-sm"
+              onClick={() => setShowModal(true)}
+            >
               <Plus size={16} />
               <span>Add {activeTab === 'revenue' ? 'Revenue' : 'Expense'}</span>
             </button>
@@ -137,6 +147,14 @@ const Financials = () => {
           </table>
         </div>
       </div>
+
+      {showModal && (
+        <FinanceForm 
+          type={activeTab}
+          onSuccess={handleAddSuccess}
+          onCancel={() => setShowModal(false)}
+        />
+      )}
 
       <style jsx>{`
         .finance-page { display: flex; flex-direction: column; gap: 2rem; }

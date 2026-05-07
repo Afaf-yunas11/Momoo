@@ -41,7 +41,7 @@ const ReportCenter = () => {
   const handleGenerate = async (type) => {
     setGenerating(true);
     try {
-      await reportService.generateReport({ type });
+      await reportService.generateReport({ reportType: type });
       fetchReports();
     } catch (error) {
       console.error('Failed to generate report', error);
@@ -141,8 +141,14 @@ const ReportCenter = () => {
 
         .reports-grid {
           display: grid;
-          grid-template-columns: 350px 1fr;
+          grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
           gap: 2rem;
+        }
+
+        @media (min-width: 1024px) {
+          .reports-grid {
+            grid-template-columns: 350px 1fr;
+          }
         }
 
         .generator-card { position: relative; overflow: hidden; padding: 1.5rem; border-radius: 1rem; }

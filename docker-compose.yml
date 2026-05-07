@@ -1,0 +1,61 @@
+services:
+  postgres:
+    image: postgres:16
+    container_name: moomoo-postgres
+    environment:
+      POSTGRES_DB: moomoo
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  ai-backend:
+    build:
+      context: ./ai-backend
+      dockerfile: Dockerfile
+    container_name: moomoo-ai-backend
+    environment:
+      OPENROUTER_API_KEY: ${OPENROUTER_API_KEY:-your_key_here}
+      OPENROUTER_MODEL: ${OPENROUTER_MODEL:-nvidia/nemotron-3-super-120b-a12b:free}
+      AI_SERVICE_NAME: moomoo-ai-backend
+    ports:
+      - "8000:8000"
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: moomoo-backend
+    environment:
+      DB_URL: jdbc:postgresql://postgres:5432/moomoo
+      DB_USERNAME: postgres
+      DB_PASSWORD: postgres
+      AI_SERVICE_URL: http://ai-backend:8000
+      JWT_SECRET: ${JWT_SECRET:-change-this-secret-key-change-this-secret-key}
+    ports:
+      - "8080:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      ai-backend:
+        condition: service_started
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: moomoo-frontend
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+
+volumes:
+  postgres_data:

@@ -101,6 +101,7 @@ public class MilkRecordService {
             alert.setMessage("SCC threshold exceeded");
             alert.setRecommendedAction("Trigger health review and AI mastitis screening");
             alert.setCreatedAt(Instant.now());
+            alert.setFarmId(SecurityUtils.getCurrentFarmId());
             aiAlertRepository.save(alert);
         }
         return toResponse(saved);

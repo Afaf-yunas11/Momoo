@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Outlet, Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import ChatSidebar from './ChatSidebar';
@@ -20,6 +20,25 @@ const Layout = () => {
   const { logout, user } = useAuth();
   const location = useLocation();
   const [isChatOpen, setIsChatOpen] = useState(false);
+  const [alertCount, setAlertCount] = useState(0);
+
+  useEffect(() => {
+    const fetchAlertCount = async () => {
+      try {
+        const { healthService } = await import('../../api/services/healthService');
+        const data = await healthService.getAlerts({ reviewed: false, size: 1 });
+        setAlertCount(data.totalElements || 0);
+      } catch (error) {
+        console.error('Failed to fetch alerts', error);
+      }
+    };
+
+    if (user) {
+      fetchAlertCount();
+      const interval = setInterval(fetchAlertCount, 60000); // Refresh every minute
+      return () => clearInterval(interval);
+    }
+  }, [user]);
 
   const menuItems = [
     { icon: <LayoutDashboard size={20} />, label: 'Dashboard', path: '/' },
@@ -71,9 +90,9 @@ const Layout = () => {
               <Sparkles size={20} />
               <span>AI Advisor</span>
             </button>
-            <button className="notification-btn">
+            <button className="notification-btn" title={`${alertCount} active alerts`}>
               <Bell size={20} />
-              <span className="notification-badge">3</span>
+              {alertCount > 0 && <span className="notification-badge">{alertCount}</span>}
             </button>
             <div className="user-info">
               <span className="user-name">{user?.email?.split('@')[0]}</span>

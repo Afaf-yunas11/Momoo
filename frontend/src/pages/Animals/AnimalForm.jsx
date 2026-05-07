@@ -6,13 +6,13 @@ const AnimalForm = ({ animal, onSuccess, onCancel }) => {
   const isEdit = !!animal;
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  
+
   const [formData, setFormData] = useState(animal || {
     tagNumber: '',
     name: '',
     breed: '',
     dateOfBirth: '',
-    status: 'HEALTHY',
+    status: 'LACTATING',
     notes: ''
   });
 
@@ -20,7 +20,7 @@ const AnimalForm = ({ animal, onSuccess, onCancel }) => {
     e.preventDefault();
     setLoading(true);
     setError('');
-    
+
     try {
       if (isEdit) {
         await animalService.updateAnimal(animal.id, formData);
@@ -38,46 +38,46 @@ const AnimalForm = ({ animal, onSuccess, onCancel }) => {
   return (
     <form onSubmit={handleSubmit} className="animal-form">
       {error && <div className="error-message">{error}</div>}
-      
+
       <div className="form-grid">
         <div className="form-group">
           <label>Tag Number</label>
-          <input 
-            type="text" 
-            required 
+          <input
+            type="text"
+            required
             value={formData.tagNumber}
-            onChange={(e) => setFormData({...formData, tagNumber: e.target.value})}
+            onChange={(e) => setFormData({ ...formData, tagNumber: e.target.value })}
             placeholder="e.g. COW-001"
           />
         </div>
 
         <div className="form-group">
           <label>Name</label>
-          <input 
-            type="text" 
-            required 
+          <input
+            type="text"
+            required
             value={formData.name}
-            onChange={(e) => setFormData({...formData, name: e.target.value})}
+            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
             placeholder="e.g. Bessie"
           />
         </div>
 
         <div className="form-group">
           <label>Breed</label>
-          <input 
-            type="text" 
-            required 
+          <input
+            type="text"
+            required
             value={formData.breed}
-            onChange={(e) => setFormData({...formData, breed: e.target.value})}
+            onChange={(e) => setFormData({ ...formData, breed: e.target.value })}
             placeholder="e.g. Holstein"
           />
         </div>
 
         <div className="form-group">
           <label>Status</label>
-          <select 
+          <select
             value={formData.status}
-            onChange={(e) => setFormData({...formData, status: e.target.value})}
+            onChange={(e) => setFormData({ ...formData, status: e.target.value })}
           >
             <option value="LACTATING">Lactating</option>
             <option value="DRY">Dry</option>
@@ -89,21 +89,21 @@ const AnimalForm = ({ animal, onSuccess, onCancel }) => {
 
         <div className="form-group">
           <label>Date of Birth</label>
-          <input 
-            type="date" 
-            required 
+          <input
+            type="date"
+            required
             value={formData.dateOfBirth}
-            onChange={(e) => setFormData({...formData, dateOfBirth: e.target.value})}
+            onChange={(e) => setFormData({ ...formData, dateOfBirth: e.target.value })}
           />
         </div>
       </div>
 
       <div className="form-group full-width">
         <label>Notes</label>
-        <textarea 
+        <textarea
           rows="3"
           value={formData.notes}
-          onChange={(e) => setFormData({...formData, notes: e.target.value})}
+          onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
           placeholder="Additional details..."
         ></textarea>
       </div>

@@ -120,6 +120,7 @@ public class AnimalService {
             alert.setMessage("Weight is below configured threshold");
             alert.setRecommendedAction("Review feed plan and trigger feed agent recalculation");
             alert.setCreatedAt(Instant.now());
+            alert.setFarmId(SecurityUtils.getCurrentFarmId());
             aiAlertRepository.save(alert);
         }
 

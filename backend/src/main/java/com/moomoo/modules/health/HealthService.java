@@ -38,6 +38,7 @@ public class HealthService {
     public Vaccination addVaccination(UUID animalId, Vaccination vaccination) {
         vaccination.setAnimal(animalRepository.findById(animalId)
                 .orElseThrow(() -> new ResourceNotFoundException("Animal not found: " + animalId)));
+        vaccination.setFarmId(com.moomoo.common.SecurityUtils.getCurrentFarmId());
         return vaccinationRepository.save(vaccination);
     }
 
@@ -48,6 +49,7 @@ public class HealthService {
     public DiseaseRecord addDiseaseRecord(UUID animalId, DiseaseRecord record) {
         record.setAnimal(animalRepository.findById(animalId)
                 .orElseThrow(() -> new ResourceNotFoundException("Animal not found: " + animalId)));
+        record.setFarmId(com.moomoo.common.SecurityUtils.getCurrentFarmId());
         return diseaseRecordRepository.save(record);
     }
 
@@ -55,6 +57,12 @@ public class HealthService {
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
         Specification<AiAlert> specification = (root, query, cb) -> {
             List<Predicate> predicates = new ArrayList<>();
+            
+            UUID farmId = com.moomoo.common.SecurityUtils.getCurrentFarmId();
+            if (farmId != null) {
+                predicates.add(cb.equal(root.get("farmId"), farmId));
+            }
+
             if (severity != null && !severity.isBlank()) {
                 predicates.add(cb.equal(root.get("severity"), Enum.valueOf(com.moomoo.common.AlertSeverity.class, severity.toUpperCase())));
             }
