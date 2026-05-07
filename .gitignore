@@ -1,0 +1,11 @@
+.env
+.env.local
+.env.*.local
+node_modules/
+target/
+*.class
+.DS_Store
+.idea/
+.vscode/
+bin/
+build/

@@ -1,0 +1,2 @@
+class MissingModelConfigurationError(RuntimeError):
+    pass

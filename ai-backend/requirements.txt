@@ -1,0 +1,7 @@
+fastapi
+uvicorn[standard]
+langchain
+langgraph
+langchain-google-genai
+pydantic-settings
+langchain-openrouter

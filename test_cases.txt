@@ -1,0 +1,218 @@
+mOOMOO Platform - Quality Assurance Test Plan
+==========================================
+
+Module 1: Authentication & Multi-Tenancy
+----------------------------------------
+
+TC-01: User Registration with Farm Creation
+Short Description: Verify that a new user can register and a new farm is created automatically.
+Pre-condition: Email is not already registered.
+Input Data: Name, Email, Password (8+ chars), Farm Name.
+Steps: 
+1. Navigate to /register.
+2. Enter valid details and a unique Farm Name.
+3. Click "Start Free Trial".
+Expected Result: Account created; Farm record created; Redirected to Dashboard; JWT contains farmId.
+
+TC-02: User Login with Multi-Tenant Context
+Short Description: Verify that a user logs into their specific farm.
+Pre-condition: User is registered.
+Input Data: Email, Password.
+Steps:
+1. Navigate to /login.
+2. Enter valid credentials.
+3. Click "Sign In".
+Expected Result: User logged in; Local storage stores correct farmId.
+
+TC-03: Registration Validation - Short Password
+Short Description: Verify that registration fails if password is less than 8 characters.
+Input Data: Valid name/email, Password "123".
+Steps:
+1. Enter details with 3-char password.
+2. Click Register.
+Expected Result: Form validation error displayed; Request blocked.
+
+TC-04: Registration Validation - Duplicate Email
+Short Description: Verify system prevents duplicate registrations.
+Input Data: Existing user email.
+Steps:
+1. Enter an email that already exists in DB.
+2. Click Register.
+Expected Result: Error message "Email already registered" displayed.
+
+TC-05: Logout Functionality
+Short Description: Verify user can securely log out.
+Steps:
+1. Click Logout button in sidebar.
+Expected Result: Token cleared from local storage; Redirected to /login.
+
+Module 2: Animal Management
+---------------------------
+
+TC-06: Add New Animal to Farm
+Short Description: Verify a farmer can add a cow to their herd.
+Input Data: Tag Number, Name, Breed, Status, DOB.
+Steps:
+1. Navigate to Animal List.
+2. Click "Add Animal".
+3. Fill form and save.
+Expected Result: Animal appears in list; farm_id is correctly assigned in DB.
+
+TC-07: List Animals Filtered by Farm
+Short Description: Verify data isolation in the animal list.
+Pre-condition: Two users (User A and User B) have different farms.
+Steps:
+1. Log in as User A.
+2. Add "Cow A".
+3. Log in as User B.
+Expected Result: User B cannot see "Cow A" in their list.
+
+TC-08: View Animal Details
+Short Description: Verify all animal metadata is displayed correctly.
+Steps:
+1. Click on a specific animal in the list.
+Expected Result: Shows Name, Tag, Breed, Status, and Weight history.
+
+TC-09: Update Animal Status
+Short Description: Verify changing status from 'Lactating' to 'Dry'.
+Steps:
+1. Edit animal details.
+2. Change status dropdown.
+Expected Result: Status updated in UI and DB.
+
+TC-10: Delete Animal
+Short Description: Verify animal can be removed from herd.
+Steps:
+1. Click Delete on an animal record.
+Expected Result: Animal removed from list; Related records (milk/weight) cascaded or handled.
+
+Module 3: Milk Production
+-------------------------
+
+TC-11: Log Daily Milk Yield
+Short Description: Verify morning and evening yield logging.
+Input Data: Animal ID, Date, Morning Litres, Evening Litres.
+Steps:
+1. Navigate to Milk Records.
+2. Click "Add Record".
+Expected Result: Total yield calculated automatically; Record saved.
+
+TC-12: Milk Summary Calculation
+Short Description: Verify the dashboard shows correct total daily yield.
+Steps:
+1. Add multiple milk records for today.
+2. Check Dashboard "Daily Milk" stat.
+Expected Result: Stat matches the sum of today's records.
+
+TC-13: Duplicate Milk Record Prevention
+Short Description: Prevent logging multiple records for the same animal/session/date.
+Expected Result: System shows error if record already exists for that session.
+
+Module 4: Feed & Inventory
+--------------------------
+
+TC-14: Add Feed Type
+Short Description: Create a new feed category (e.g. Corn Silage).
+Expected Result: Feed type available in dropdowns for logging consumption.
+
+TC-15: Log Feed Consumption
+Short Description: Verify recording how much a cow ate.
+Input Data: Animal, Feed Type, Quantity (kg).
+Expected Result: Inventory stock reduced by the consumed amount.
+
+TC-16: Low Stock Alert
+Short Description: Verify alert triggers when inventory is below threshold.
+Steps:
+1. Reduce stock via consumption until below "Low Stock Threshold".
+Expected Result: Dashboard shows a "Low Stock" warning.
+
+Module 5: Finance & Reports
+---------------------------
+
+TC-17: Record Milk Sales Revenue
+Short Description: Verify financial logging of sales.
+Input Data: Category (Milk Sales), Amount, Date.
+Expected Result: Profit summary updated; Record appears in Financials.
+
+TC-18: Record Veterinary Expense
+Short Description: Verify logging farm costs.
+Input Data: Category (Vet), Amount, Vendor.
+Expected Result: Net profit decreases; Record stored.
+
+TC-19: Generate Monthly PDF Report
+Short Description: Verify report generation process.
+Steps:
+1. Navigate to Reports.
+2. Select "Monthly Production".
+3. Click "Generate".
+Expected Result: Report appears in "Archived Reports" list.
+
+TC-20: Download PDF Report
+Short Description: Verify the actual file download.
+Steps:
+1. Click Download icon on an archived report.
+Expected Result: A valid .pdf file is downloaded to the local machine.
+
+Module 6: AI Insights & Health
+------------------------------
+
+TC-21: Trigger AI Health Alert
+Short Description: Verify AI identifies sick animals.
+Pre-condition: A milk record with extremely low yield or high SCC is logged.
+Expected Result: AI Alert appears on Dashboard with "High" severity.
+
+TC-22: Review AI Alert
+Short Description: Verify an alert can be dismissed/marked as reviewed.
+Steps:
+1. Click "Review" on an alert.
+Expected Result: Alert moves to "Reviewed" status; Disappears from active dashboard list.
+
+TC-23: Animal Profitability Insight
+Short Description: Verify AI "Keep/Sell" recommendation.
+Steps:
+1. View Animal Details.
+2. Click "Get AI Insights".
+Expected Result: AI analyzes production vs feed cost and shows "KEEP" or "SELL".
+
+Module 7: System Administration
+-------------------------------
+
+TC-24: Admin User Management
+Short Description: Verify system admin can see all users.
+Pre-condition: Logged in as System Admin.
+Expected Result: List of all registered farmers/farms is visible.
+
+TC-25: Multi-Tenant Data Leakage Test (Cross-Site)
+Short Description: Verify User A cannot access User B's record via direct URL.
+Steps:
+1. Log in as User A.
+2. Try to access `/api/animals/{User_B_Cow_ID}`.
+Expected Result: 404 Not Found or 403 Forbidden returned.
+
+TC-26: Database Migration Integrity
+Short Description: Verify V2 migration didn't lose V1 data.
+Expected Result: All legacy data is visible under the "Default Smart Farm".
+
+Module 8: Performance & UI
+--------------------------
+
+TC-27: Dashboard Loading Speed
+Short Description: Verify dashboard loads under 2 seconds.
+Expected Result: Skeleton screens or loaders show briefly, then data appears.
+
+TC-28: Responsive Design - Mobile
+Short Description: Verify sidebar collapses on mobile screens.
+Steps:
+1. Resize browser to 375px width.
+Expected Result: Hamburger menu appears; Layout stacks vertically.
+
+TC-29: Token Expiration & Refresh
+Short Description: Verify automatic token refresh.
+Pre-condition: Access token expires.
+Expected Result: Client uses Refresh Token to get new Access Token without logging out user.
+
+TC-30: Global Exception Handling
+Short Description: Verify non-existent pages show a friendly 404.
+Steps:
+1. Navigate to /non-existent-page.
+Expected Result: User-friendly "Page Not Found" displayed.
